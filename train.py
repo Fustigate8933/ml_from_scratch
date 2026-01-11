@@ -1,19 +1,30 @@
 from model import LinearRegression
+import numpy as np
 
-def train_one_epoch(model, X, y, lr):
+
+def train_one_epoch(model: LinearRegression, X: np.ndarray, y: np.ndarray, lr: float):
     """
     Run one epoch of training.
     """
-    pass
+    y_pred = model.forward(X)
+    loss = model.compute_loss(y_pred, y)
+    model.backward(X, y_pred, y)
+    model.step(lr)
+    
+    return loss
 
-def validate(model, X, y):
+
+def validate(model: LinearRegression, X: np.ndarray, y: np.ndarray):
     """
     Evaluate model on validation set.
     """
-    pass
+    y_pred = model.predict(X)
+    loss = model.compute_loss(y_pred, y)
+    return loss
+
 
 def train(
-    model,
+    model: LinearRegression,
     X_train,
     y_train,
     X_val,
@@ -24,5 +35,12 @@ def train(
     """
     Full training loop.
     """
-    pass
+    train_losses = []
+    val_losses = []
+    for epoch in range(num_epochs):
+        train_loss = train_one_epoch(model, X_train, y_train, lr)
+        val_loss = validate(model, X_val, y_val)
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
 
+        print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
