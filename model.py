@@ -2,7 +2,7 @@ import numpy as np
 
 class LinearRegression:
     def __init__(self, num_features: int):
-        self.weights = np.random.randn(1, num_features)
+        self.weights = np.random.randn(1, num_features) * 0.01
         self.bias = np.random.randn(1)
         self.grad_w = np.zeros_like(self.weights)
         self.grad_b = 0.0

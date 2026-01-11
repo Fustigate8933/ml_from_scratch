@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+import seaborn as sns
 from config import Config
 from data import load_data, train_val_split, normalize_features
 from model import LinearRegression
@@ -8,20 +10,28 @@ config = Config()
 def main():
     data = load_data(config.DATA_PATH)
     X_train, y_train, X_val, y_val, X_test, y_test = train_val_split(data)
+    X_train = normalize_features(X_train)
+    X_val = normalize_features(X_val)
 
-    print(X_train.shape, y_train.shape)
+    print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}, X_val shape: {X_val.shape}, y_val shape: {y_val.shape}")
 
     model = LinearRegression(num_features=X_train.shape[1])
 
-    train(
+    train_losses, val_losses = train(
         model=model,
         X_train=X_train,
         y_train=y_train,
         X_val=X_val,
         y_val=y_val,
-        num_epochs=Config.NUM_EPOCHS,
-        lr=Config.LEARNING_RATE,
+        num_epochs=config.NUM_EPOCHS,
+        lr=config.LEARNING_RATE,
     )
+
+    # plt.figure(figsize=(10, 6))
+    # sns.lineplot(x=range(config.NUM_EPOCHS), y=train_losses, label="Train Loss")
+    # sns.lineplot(x=range(config.NUM_EPOCHS), y=val_losses , label="Validation Loss")
+    # plt.show()
+    # plt.savefig("training_validation_loss.png")
 
 if __name__ == "__main__":
     main()

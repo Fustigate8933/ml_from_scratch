@@ -31,7 +31,7 @@ def load_data(path: str) -> pd.DataFrame:
     return data_shuffled
 
 
-def train_val_split(data: pd.DataFrame, frac: float = 0.2):
+def train_val_split(data: pd.DataFrame, frac: float = 0.2) -> tuple[np.ndarray, pd.Series, np.ndarray, pd.Series, np.ndarray, pd.Series]:
     """
     Split data into training, validation, and test sets
     """
@@ -43,10 +43,6 @@ def train_val_split(data: pd.DataFrame, frac: float = 0.2):
     data_train = data[n_train:].reset_index(drop=True)
     data_val = data[n_train: n_train + n_val].reset_index(drop=True)
     data_test = data[n_train + n_val:].reset_index(drop=True)
-
-    print(f"Train size: {len(data_train)}")
-    print(f"Validation size: {len(data_val)}")
-    print(f"Test size: {len(data_test)}")
 
     X_train = data_train.drop(columns=["MSRP"]).values
     y_train = data_train["MSRP"]
@@ -62,4 +58,7 @@ def normalize_features(X: np.ndarray):
     """
     Normalize features (mean/std).
     """
-    pass
+    mean = X.mean(axis=0)
+    std = X.std(axis=0)
+    X_norm = (X - mean) / std
+    return X_norm
