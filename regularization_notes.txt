@@ -1,0 +1,23 @@
+After adding L2 regularization:
+
+lambda = 0: 
+	train loss: 1415343553.9706
+	val loss: 1139509307.8801
+	weight norm: 33974.1833
+
+lambda = 0.01:
+	train loss: 1426876694.6793
+	val loss: 1151309979.5349
+	weight norm: 33518.8945
+
+lambda = 1:
+	train loss: 2008424434.7003
+	val loss: 1710969211.0849
+	weight norm: 18473.8563
+
+
+### Why didn't L2 regularization improve performance (val loss)?
+1. Linear regression might not be complex enough to benefit from regularization. 
+2. If the model is underfitting, adding L2 regularization can worsen performance.
+3. The dataset might not have enough noise or complexity to require regularization (data has low variance).
+4. Feature scaling might not have been applied, making regularization less effective.

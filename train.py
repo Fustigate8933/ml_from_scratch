@@ -45,4 +45,5 @@ def train(
         
         if (epoch + 1) % log_interval == 0:
             print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
+            print(f"Weight norm: {np.linalg.norm(model.weights):.4f}")
     return train_losses, val_losses
