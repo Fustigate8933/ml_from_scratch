@@ -1,7 +1,7 @@
-# Linear Regression from Scratch (NumPy)
+# ML from Scratch (NumPy)
 
 ## Goal
-Implement linear regression using only NumPy.
+Implement linear regression and logistic regression using only NumPy.
 
 ## Features
 - Gradient descent
