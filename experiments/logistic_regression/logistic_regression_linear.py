@@ -18,8 +18,6 @@ def main():
     X_train = normalize_features(X_train)
     X_val = normalize_features(X_val)
 
-    print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}, X_val shape: {X_val.shape}, y_val shape: {y_val.shape}")
-
     model = LogisticRegression(num_features=X_train.shape[1], reg_lambda=args.reg_lambda)
 
     train_losses, val_losses = train(
