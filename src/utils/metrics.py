@@ -10,14 +10,15 @@ def mean_squared_error(y_pred: np.ndarray, y_true: np.ndarray):
 def accuracy(y_pred: np.ndarray, y_true: np.ndarray, threshold: float = 0.5):
     """
     Compute classification accuracy.
-    
-    Args:
-        y_pred: Predicted probabilities (0-1)
-        y_true: True binary labels (0 or 1)
-        threshold: Classification threshold (default 0.5)
+    For multiclass, y_pred should be (n_samples, n_classes) and y_true integer labels.
+    For binary, y_pred can be probabilities.
     """
-    y_pred_binary = (y_pred >= threshold).astype(int)
-    return np.mean(y_pred_binary == y_true)
+    if y_pred.ndim == 2:
+        y_pred_labels = np.argmax(y_pred, axis=1)
+        return np.mean(y_pred_labels == y_true)
+    else:
+        y_pred_binary = (y_pred >= threshold).astype(int)
+        return np.mean(y_pred_binary == y_true)
 
 
 def precision(y_pred: np.ndarray, y_true: np.ndarray, threshold: float = 0.5):
@@ -61,34 +62,41 @@ def f1_score(y_pred: np.ndarray, y_true: np.ndarray, threshold: float = 0.5):
 def confusion_matrix(y_pred: np.ndarray, y_true: np.ndarray, threshold: float = 0.5):
     """
     Compute confusion matrix.
-    
-    Returns:
-        dict with keys: 'TP', 'TN', 'FP', 'FN'
+    For multiclass, returns a matrix. For binary, returns dict.
     """
-    y_pred_binary = (y_pred >= threshold).astype(int)
-    
-    tp = np.sum((y_pred_binary == 1) & (y_true == 1))
-    tn = np.sum((y_pred_binary == 0) & (y_true == 0))
-    fp = np.sum((y_pred_binary == 1) & (y_true == 0))
-    fn = np.sum((y_pred_binary == 0) & (y_true == 1))
-    
-    return {'TP': int(tp), 'TN': int(tn), 'FP': int(fp), 'FN': int(fn)}
+    if y_pred.ndim == 2:
+        y_pred_labels = np.argmax(y_pred, axis=1)
+        n_classes = np.max(np.concatenate([y_pred_labels, y_true])) + 1
+        matrix = np.zeros((n_classes, n_classes), dtype=int)
+        for t, p in zip(y_true, y_pred_labels):
+            matrix[int(t), int(p)] += 1
+        return matrix
+    else:
+        y_pred_binary = (y_pred >= threshold).astype(int)
+        tp = np.sum((y_pred_binary == 1) & (y_true == 1))
+        tn = np.sum((y_pred_binary == 0) & (y_true == 0))
+        fp = np.sum((y_pred_binary == 1) & (y_true == 0))
+        fn = np.sum((y_pred_binary == 0) & (y_true == 1))
+        return {'TP': int(tp), 'TN': int(tn), 'FP': int(fp), 'FN': int(fn)}
 
 
 def evaluate_classification(y_pred: np.ndarray, y_true: np.ndarray, threshold: float = 0.5):
     """
     Compute all classification metrics at once.
-    
-    Returns:
-        dict with all metrics
+    For multiclass, only accuracy and confusion matrix are returned.
     """
-    cm = confusion_matrix(y_pred, y_true, threshold)
-    
-    return {
-        'accuracy': accuracy(y_pred, y_true, threshold),
-        'precision': precision(y_pred, y_true, threshold),
-        'recall': recall(y_pred, y_true, threshold),
-        'f1_score': f1_score(y_pred, y_true, threshold),
-        'confusion_matrix': cm
-    }
+    if y_pred.ndim == 2:
+        return {
+            'accuracy': accuracy(y_pred, y_true),
+            'confusion_matrix': confusion_matrix(y_pred, y_true)
+        }
+    else:
+        cm = confusion_matrix(y_pred, y_true, threshold)
+        return {
+            'accuracy': accuracy(y_pred, y_true, threshold),
+            'precision': precision(y_pred, y_true, threshold),
+            'recall': recall(y_pred, y_true, threshold),
+            'f1_score': f1_score(y_pred, y_true, threshold),
+            'confusion_matrix': cm
+        }
 

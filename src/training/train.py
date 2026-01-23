@@ -6,7 +6,7 @@ def train_one_epoch(model: BaseModel, X: np.ndarray, y: np.ndarray, lr: float):
     """
     Run one epoch of training.
     """
-    y_pred = model.forward(X).reshape(-1)
+    y_pred = model.forward(X)
     loss = model.compute_loss(y_pred, y)
     model.backward(X, y_pred, y)
     model.step(lr)
@@ -17,7 +17,7 @@ def validate(model: BaseModel, X: np.ndarray, y: np.ndarray):
     """
     Evaluate model on validation set.
     """
-    y_pred = model.predict(X).reshape(-1)
+    y_pred = model.forward(X)
     loss = model.compute_loss(y_pred, y)
     return loss
 

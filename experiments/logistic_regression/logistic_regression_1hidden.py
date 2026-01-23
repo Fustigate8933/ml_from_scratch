@@ -47,37 +47,27 @@ def main():
     print("MODEL EVALUATION ON TEST SET")
     print("="*50)
     
-    y_pred_test = model.predict(X_test)
+    y_pred_test = model.forward(X_test)
     test_metrics = evaluate_classification(y_pred_test, y_test)
-    
-    print(f"\nAccuracy:  {test_metrics['accuracy']:.4f}")
-    print(f"Precision: {test_metrics['precision']:.4f}")
-    print(f"Recall:    {test_metrics['recall']:.4f}")
-    print(f"F1 Score:  {test_metrics['f1_score']:.4f}")
-    
-    print("\nConfusion Matrix:")
-    cm = test_metrics['confusion_matrix']
-    print(f"  True Positives:  {cm['TP']}")
-    print(f"  True Negatives:  {cm['TN']}")
-    print(f"  False Positives: {cm['FP']}")
-    print(f"  False Negatives: {cm['FN']}")
-    
+    print(f"\nTest Accuracy:  {test_metrics['accuracy']:.4f}")
+    print("Confusion Matrix (rows: true, cols: pred):\n", test_metrics['confusion_matrix'])
+
     # Also evaluate on training and validation sets
     print("\n" + "="*50)
     print("TRAINING SET PERFORMANCE")
     print("="*50)
-    y_pred_train = model.predict(X_train)
+    y_pred_train = model.forward(X_train)
     train_metrics = evaluate_classification(y_pred_train, y_train)
-    print(f"Accuracy:  {train_metrics['accuracy']:.4f}")
-    print(f"F1 Score:  {train_metrics['f1_score']:.4f}")
-    
+    print(f"Train Accuracy:  {train_metrics['accuracy']:.4f}")
+    print("Confusion Matrix:\n", train_metrics['confusion_matrix'])
+
     print("\n" + "="*50)
     print("VALIDATION SET PERFORMANCE")
     print("="*50)
-    y_pred_val = model.predict(X_val)
+    y_pred_val = model.forward(X_val)
     val_metrics = evaluate_classification(y_pred_val, y_val)
-    print(f"Accuracy:  {val_metrics['accuracy']:.4f}")
-    print(f"F1 Score:  {val_metrics['f1_score']:.4f}")
+    print(f"Validation Accuracy:  {val_metrics['accuracy']:.4f}")
+    print("Confusion Matrix:\n", val_metrics['confusion_matrix'])
     print()
 
 if __name__ == "__main__":

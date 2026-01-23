@@ -21,7 +21,17 @@ def load_data(path: str) -> pd.DataFrame:
         features.append(feature)
 
     data = car_data[features + ["MSRP"]].dropna().reset_index(drop=True)
-    data["Expensive"] = (data["MSRP"] > data["MSRP"].median()).astype(int)
+
+    # Create 4 price categories (quartiles)
+    price_bins = np.percentile(data["MSRP"], [0, 25, 50, 75, 100])
+    # Ensure unique bin edges
+    price_bins = np.unique(price_bins)
+    # If duplicate edges, use pd.qcut fallback
+    if len(price_bins) < 5:
+        data["PriceCategory"], bins = pd.qcut(data["MSRP"], 4, labels=False, retbins=True, duplicates="drop")
+    else:
+        data["PriceCategory"] = np.digitize(data["MSRP"], price_bins, right=True) - 1
+        data["PriceCategory"] = data["PriceCategory"].clip(0, 3)
 
     np.random.seed(config.RANDOM_SEED)
     n = len(data)
@@ -34,7 +44,8 @@ def load_data(path: str) -> pd.DataFrame:
 
 def train_val_split(data: pd.DataFrame, frac: float = 0.2, categorical: bool = False) -> tuple[np.ndarray, pd.Series, np.ndarray, pd.Series, np.ndarray, pd.Series]:
     """
-    Split data into training, validation, and test sets
+    Split data into training, validation, and test sets.
+    If categorical=True, use 'PriceCategory' as multiclass target (0-3).
     """
     n = len(data)
     n_test = int(n * frac)
@@ -45,7 +56,7 @@ def train_val_split(data: pd.DataFrame, frac: float = 0.2, categorical: bool = F
     data_val = data[n_train: n_train + n_val].reset_index(drop=True)
     data_test = data[n_train + n_val:].reset_index(drop=True)
 
-    target = "Expensive" if categorical else "MSRP"
+    target = "PriceCategory" if categorical else "MSRP"
 
     X_train = data_train.drop(columns=[target]).values
     y_train = data_train[target].values
